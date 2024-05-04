@@ -1,32 +1,44 @@
-import React, { useState } from "react";
-import ItemForm from "./ItemForm";
-import Filter from "./Filter";
-import Item from "./Item";
+import React, {useState} from "react";
+import { v4 as uuid } from "uuid";
 
-function ShoppingList({ items }) {
-  const [selectedCategory, setSelectedCategory] = useState("All");
+function ItemForm({ onItemFormSubmit }) {
+  const [newItem, setNewItem] = useState({
+    id: uuid(),
+    name: "",
+    category: "Produce"
+  })
 
-  function handleCategoryChange(event) {
-    setSelectedCategory(event.target.value);
+  function handleChange(event) {
+    setNewItem({
+      ...newItem,
+      [event.target.name]: event.target.value
+    })
   }
 
-  const itemsToDisplay = items.filter((item) => {
-    if (selectedCategory === "All") return true;
-
-    return item.category === selectedCategory;
-  });
+  function handleSubmit(event) {
+    event.preventDefault()
+    onItemFormSubmit(newItem)
+  }
 
   return (
-    <div className="ShoppingList">
-      <ItemForm />
-      <Filter onCategoryChange={handleCategoryChange} />
-      <ul className="Items">
-        {itemsToDisplay.map((item) => (
-          <Item key={item.id} name={item.name} category={item.category} />
-        ))}
-      </ul>
-    </div>
+    <form onSubmit={handleSubmit} className="NewItem">
+      <label>
+        Name:
+        <input type="text" name="name" onChange={handleChange} />
+      </label>
+
+      <label>
+        Category:
+        <select name="category" onChange={handleChange}>
+          <option value="Produce">Produce</option>
+          <option value="Dairy">Dairy</option>
+          <option value="Dessert">Dessert</option>
+        </select>
+      </label>
+
+      <button type="submit">Add to List</button>
+    </form>
   );
 }
 
-export default ShoppingList;
+export default ItemForm;
